@@ -1,0 +1,23 @@
+services:
+  users_database:
+      image: postgres:15
+      container_name: ${DB_NAME}
+      environment:
+        POSTGRES_DB: ${DB_NAME}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      networks:
+        - y-network
+      volumes:
+        - users_data:/var/lib/postgresql/data
+        - ./create-dbs.sh:/docker-entrypoint-initdb.d/create-dbs.sh
+      ports:
+        - "${DB_PORT}:5432"
+
+networks:
+  y-network:
+    name: y-network
+    # external: true
+
+volumes:
+  users_data:

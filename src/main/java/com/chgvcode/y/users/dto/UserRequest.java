@@ -1,5 +1,6 @@
 package com.chgvcode.y.users.dto;
 
-public class UserRequest {
-    
-}
+public record UserRequest (
+    String username,
+    String password
+){}

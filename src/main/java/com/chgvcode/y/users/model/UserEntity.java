@@ -26,8 +26,8 @@ public class UserEntity {
 
     private String username;
 
-    // Encrypted password
-    private String password;
+    @Column(name = "password_hash")
+    private String passwordHash;
 
     // private Role role;
 
@@ -36,7 +36,7 @@ public class UserEntity {
 
     public UserEntity(String username, String password) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = password;
         this.createdAt = Instant.now();
     }
     

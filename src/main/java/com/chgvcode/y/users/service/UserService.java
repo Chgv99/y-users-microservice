@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
 
+    // Needs to map userentity into userresponse
     public List<UserEntity> getUsers() {
         return userRepository.findAll();
     }

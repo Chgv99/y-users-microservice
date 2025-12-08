@@ -1,4 +1,4 @@
-package com.chgvcode.y.users.auth;
+package com.chgvcode.y.users.auth.dto;
 
 public record RegisterRequest(
     String username,

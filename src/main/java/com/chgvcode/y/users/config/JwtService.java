@@ -1,6 +1,5 @@
 package com.chgvcode.y.users.config;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -20,7 +18,7 @@ import jakarta.annotation.PostConstruct;
 public class JwtService implements IJwtService {
 
     @Value("${application.security.jwt.secret-key}")
-    private static String SECRET_KEY;
+    private String SECRET_KEY;
 
     @Value("${application.security.jwt.expiration}")
     private int EXPIRATION_MS;
@@ -33,9 +31,9 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
-                .subject(username)
+                .subject(userDetails.getUsername())
                 // .claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
@@ -45,7 +43,7 @@ public class JwtService implements IJwtService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractClaim(token, Claims::getSubject);
+        final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 

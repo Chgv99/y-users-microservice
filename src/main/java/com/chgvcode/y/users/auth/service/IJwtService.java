@@ -1,4 +1,4 @@
-package com.chgvcode.y.users.config;
+package com.chgvcode.y.users.auth.service;
 
 import java.util.Date;
 

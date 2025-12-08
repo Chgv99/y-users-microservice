@@ -36,7 +36,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
         UserEntity user = userService.createUser(request.username(), request.password());
-        UserResponse userResponse = new UserResponse(user.getId(), user.getUsername(), user.getPasswordHash(), user.getCreatedAt());
+        UserResponse userResponse = new UserResponse(user.getId(), user.getUsername(), user.getPassword(), user.getCreatedAt());
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
     

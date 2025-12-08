@@ -2,14 +2,12 @@ package com.chgvcode.y.users.auth.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
 import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
-import com.chgvcode.y.users.config.JwtService;
 import com.chgvcode.y.users.config.Role;
 import com.chgvcode.y.users.model.UserEntity;
 import com.chgvcode.y.users.repository.UserRepository;
@@ -18,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthenticationService implements IAuthenticationService {
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
 

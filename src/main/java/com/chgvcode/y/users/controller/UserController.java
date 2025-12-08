@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.chgvcode.y.users.dto.UserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.model.UserEntity;
-import com.chgvcode.y.users.service.UserService;
+import com.chgvcode.y.users.service.IUserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     // Needs mapping
     @GetMapping

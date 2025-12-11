@@ -29,7 +29,7 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         var user = UserEntity.builder()
                 .username(request.username())
-                .passwordHash(passwordEncoder.encode(request.password()))
+                .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
                 .build();
         userRepository.save(user);

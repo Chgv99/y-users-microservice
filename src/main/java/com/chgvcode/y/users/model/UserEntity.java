@@ -35,8 +35,8 @@ public class UserEntity implements UserDetails { // extends User
 
     private String username;
 
-    @Column(name = "password_hash")
-    private String passwordHash;
+    @Column(name = "password")
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -46,7 +46,7 @@ public class UserEntity implements UserDetails { // extends User
 
     public UserEntity(String username, String password) {
         this.username = username;
-        this.passwordHash = password;
+        this.password = password;
         this.createdAt = Instant.now();
     }
 
@@ -61,7 +61,7 @@ public class UserEntity implements UserDetails { // extends User
 
     @Override
     public String getPassword() {
-        return passwordHash;
+        return password;
     }
 
     public Role getRole() {

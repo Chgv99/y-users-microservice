@@ -1,2 +1,2 @@
-INSERT INTO _user (username, password, role, created_at) VALUES
-    ('test', '$2a$12$1OGFRZMIckaCVx1BpTUtQe4OmEwudFQjXL64BxH6RwsDZBB.m6Z..', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO _user (uuid, username, password, role, created_at) VALUES
+    ('70332658-0b8e-4a3e-8875-19088556e487', 'test', '$2a$12$1OGFRZMIckaCVx1BpTUtQe4OmEwudFQjXL64BxH6RwsDZBB.m6Z..', 'USER', CURRENT_TIMESTAMP);

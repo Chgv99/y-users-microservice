@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.chgvcode.y.users.model.UserEntity;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -31,10 +33,10 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserEntity user) {
         return Jwts.builder()
-                .subject(userDetails.getUsername())
-                // .claim("userId", userId)
+                .subject(user.getUsername())
+                .claim("uuid", user.getUuid())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey())

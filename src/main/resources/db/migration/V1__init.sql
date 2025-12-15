@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS _user (
     id BIGSERIAL PRIMARY KEY,
+    uuid UUID NOT NULL, 
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,

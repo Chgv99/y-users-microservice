@@ -4,8 +4,10 @@ import java.util.Date;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.chgvcode.y.users.model.UserEntity;
+
 public interface IJwtService {
-    public String generateToken(UserDetails userDetails);
+    public String generateToken(UserEntity user);
 
     public boolean isTokenValid(String token, UserDetails userDetails);
 

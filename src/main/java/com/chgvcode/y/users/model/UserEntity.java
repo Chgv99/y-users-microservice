@@ -3,6 +3,7 @@ package com.chgvcode.y.users.model;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,6 +34,8 @@ public class UserEntity implements UserDetails { // extends User
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private UUID uuid;
+
     private String username;
 
     @Column(name = "password")
@@ -45,6 +48,7 @@ public class UserEntity implements UserDetails { // extends User
     private Instant createdAt;
 
     public UserEntity(String username, String password) {
+        this.uuid = UUID.randomUUID();
         this.username = username;
         this.password = password;
         this.createdAt = Instant.now();
@@ -52,6 +56,10 @@ public class UserEntity implements UserDetails { // extends User
 
     public Long getId() {
         return id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override

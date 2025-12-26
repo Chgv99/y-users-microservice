@@ -35,8 +35,8 @@ public class JwtService implements IJwtService {
     @Override
     public String generateToken(UserEntity user) {
         return Jwts.builder()
-                .subject(user.getUsername())
-                .claim("uuid", user.getUuid())
+                .subject(user.getUuid().toString())
+                .claim("role", user.getRole())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey())

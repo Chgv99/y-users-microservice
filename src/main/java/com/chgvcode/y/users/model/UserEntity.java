@@ -51,6 +51,7 @@ public class UserEntity implements UserDetails { // extends User
         this.uuid = UUID.randomUUID();
         this.username = username;
         this.password = password;
+        this.role = Role.USER;
         this.createdAt = Instant.now();
     }
 

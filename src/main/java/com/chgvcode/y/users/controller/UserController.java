@@ -27,13 +27,6 @@ public class UserController {
 
     private final IUserService userService;
 
-    // Needs mapping
-    // @GetMapping
-    // public ResponseEntity<List<UserEntity>> getUsers() {
-    //     List<UserEntity> users = userService.getUsers();
-    //     return new ResponseEntity<>(users, HttpStatus.OK);
-    // }
-
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) List<UUID> uuids) {

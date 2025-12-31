@@ -20,20 +20,33 @@ public class SecurityConfig {
 
     private final AuthenticationProvider authProvider;
 
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+    // Exception {
+    // http
+    // // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    // //withDefault()
+    // .csrf(csrf -> csrf.disable())
+    // .authorizeHttpRequests(auth -> {
+    // auth
+    // .requestMatchers("/auth/**").permitAll();
+    // // .anyRequest().authenticated();
+    // })
+    // .sessionManagement(httpSecuritySessionManagementConfigurer ->
+    // httpSecuritySessionManagementConfigurer
+    // .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    // .authenticationProvider(authProvider);
+    // // .addFilterBefore(jwtAuthFilter,
+    // UsernamePasswordAuthenticationFilter.class);
+
+    // return http.build();
+    // }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // .cors(cors -> cors.configurationSource(corsConfigurationSource())) //withDefault()
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> {
-                    auth
-                            .requestMatchers("/auth/**").permitAll()
-                            .anyRequest().authenticated();
-                })
-                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
         return http.build();
     }

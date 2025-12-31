@@ -1,6 +1,7 @@
 package com.chgvcode.y.users.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,10 @@ public class UserService implements IUserService {
     // Needs to map userentity into userresponse
     public List<UserEntity> getUsers() {
         return userRepository.findAll();
+    }
+    
+    public List<UserEntity> getUsersByUuids(List<UUID> uuids) {
+        return userRepository.findByUuidIn(uuids);
     }
 
     public UserEntity createUser(String username, String password) {

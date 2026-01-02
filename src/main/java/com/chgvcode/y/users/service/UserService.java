@@ -23,6 +23,10 @@ public class UserService implements IUserService {
     public List<UserEntity> getUsersByUuids(List<UUID> uuids) {
         return userRepository.findByUuidIn(uuids);
     }
+    
+    public UserEntity getByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow();
+    }
 
     public UserEntity createUser(String username, String password) {
         UserEntity user = new UserEntity(username, password);

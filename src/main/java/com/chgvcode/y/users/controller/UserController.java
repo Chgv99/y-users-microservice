@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chgvcode.y.users.dto.UserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.messaging.UserMessageProducer;
 import com.chgvcode.y.users.model.UserEntity;
 import com.chgvcode.y.users.service.IUserService;
 
@@ -26,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final IUserService userService;
+
+    private final UserMessageProducer userMessageProducer;
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers(
@@ -49,7 +52,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
         UserEntity user = userService.createUser(request.username(), request.password());
         UserResponse userResponse = new UserResponse(user.getId(), user.getUuid(), user.getUsername(), user.getCreatedAt());
+        userMessageProducer.sendMessage(user);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
-    
 }

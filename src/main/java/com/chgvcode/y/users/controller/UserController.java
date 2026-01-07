@@ -48,11 +48,11 @@ public class UserController {
         return ResponseEntity.ok(userResponses);
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
-        UserEntity user = userService.createUser(request.username(), request.password());
-        UserResponse userResponse = new UserResponse(user.getId(), user.getUuid(), user.getUsername(), user.getCreatedAt());
-        userMessageProducer.sendMessage(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
-    }
+    // @PostMapping
+    // public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+    //     UserEntity user = userService.createUser(request.username(), request.password());
+    //     UserResponse userResponse = new UserResponse(user.getId(), user.getUuid(), user.getUsername(), user.getCreatedAt());
+    //     userMessageProducer.sendMessage(user);
+    //     return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    // }
 }

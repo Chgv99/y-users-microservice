@@ -18,7 +18,6 @@ public class UserMessageProducer {
             userEntity.getUuid(),
             userEntity.getUsername()
         );
-        System.out.println("sendMessage() " + userMessage.toString());
         rabbitTemplate.convertAndSend("userCreationQueue", userMessage);
     }
 }

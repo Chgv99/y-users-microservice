@@ -29,7 +29,7 @@ public class AuthenticationService implements IAuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        UserEntity userEntity = userService.createUser(request.username(), passwordEncoder.encode(request.password()));
+        UserEntity userEntity = userService.createUserEntity(request.username(), passwordEncoder.encode(request.password()));
 
         String jwt = jwtService.generateToken(userEntity);
         userMessageProducer.sendMessage(userEntity);
@@ -39,7 +39,7 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-        var user = userService.getByUsername(request.username());
+        UserEntity user = userService.getUserEntityByUsername(request.username());
 
         String jwt = jwtService.generateToken(user);
         return new AuthenticationResponse(jwt);

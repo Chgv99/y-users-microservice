@@ -1,7 +1,7 @@
 package com.chgvcode.y.users.auth.service;
 
 import java.util.Date;
-import java.util.function.Function;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -37,7 +37,7 @@ public class JwtService implements IJwtService {
         return Jwts.builder()
                 .subject(user.getUuid().toString())
                 .claim("username", user.getUsername())
-                .claim("role", user.getRole())
+                .claim("roles", List.of(user.getRole()))
                 .claim("createdAt", user.getCreatedAt().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
@@ -54,21 +54,11 @@ public class JwtService implements IJwtService {
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
-
+ 
     @Override
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-    
-    @Override
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        return claims.get("username", String.class);
     }
 
     private Claims extractAllClaims(String token) {
@@ -79,7 +69,6 @@ public class JwtService implements IJwtService {
             .parseSignedClaims(token)
             .getPayload();
     }
-
     
     private SecretKey getSignInKey() {
         return key;

@@ -1,7 +1,5 @@
 package com.chgvcode.y.users.auth.service;
 
-import java.util.Date;
-
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.chgvcode.y.users.model.UserEntity;
@@ -12,6 +10,4 @@ public interface IJwtService {
     public boolean isTokenValid(String token, UserDetails userDetails);
 
     public String extractUsername(String token);
-
-    public Date extractExpiration(String token);
 }

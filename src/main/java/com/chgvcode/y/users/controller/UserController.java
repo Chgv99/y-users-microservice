@@ -3,8 +3,13 @@ package com.chgvcode.y.users.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,45 +19,48 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chgvcode.y.users.dto.UserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
-import com.chgvcode.y.users.messaging.UserMessageProducer;
-import com.chgvcode.y.users.model.UserEntity;
 import com.chgvcode.y.users.service.IUserService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final IUserService userService;
 
-    private final UserMessageProducer userMessageProducer;
-
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getUsers(
-            @RequestParam(required = false) List<UUID> uuids) {
-        
-        List<UserEntity> users;
-        if (uuids != null && !uuids.isEmpty()) {
-            users = userService.getUsersByUuids(uuids);
-        } else {
-            users = userService.getUsers();
-        }
-        
-        List<UserResponse> userResponses = users.stream()
-            .map(u -> new UserResponse(u.getId(), u.getUuid(), u.getUsername(), u.getCreatedAt()))
-            .toList();
-            
-        return ResponseEntity.ok(userResponses);
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(userService.getUserByUsername(user.getUsername()));
     }
 
-    // @PostMapping
-    // public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
-    //     UserEntity user = userService.createUser(request.username(), request.password());
-    //     UserResponse userResponse = new UserResponse(user.getId(), user.getUuid(), user.getUsername(), user.getCreatedAt());
-    //     userMessageProducer.sendMessage(user);
-    //     return new ResponseEntity<>(userResponse, HttpStatus.OK);
-    // }
+    @GetMapping
+    public ResponseEntity<?> getUsers(
+            @RequestParam(required = false) List<UUID> uuids,
+            @RequestParam(required = false) List<String> usernames,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort) {
+
+        if (uuids != null && !uuids.isEmpty()) {
+            return ResponseEntity.ok(userService.getUsersByUuids(uuids));
+        } else if (usernames != null && !usernames.isEmpty()) {
+            return ResponseEntity.ok(userService.getUserListByUsernames(usernames));
+        } else {
+            String[] sortParams = sort.split(",");
+            Pageable pageable = PageRequest.of(
+                    page,
+                    size,
+                    Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]));
+            return ResponseEntity.ok(userService.getUsers(pageable));
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+        UserResponse user = userService.createUser(request.username(),
+                request.password());
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

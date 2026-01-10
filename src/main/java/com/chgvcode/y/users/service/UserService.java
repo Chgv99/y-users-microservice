@@ -13,6 +13,7 @@ import com.chgvcode.y.users.messaging.UserMessageProducer;
 import com.chgvcode.y.users.model.UserEntity;
 import com.chgvcode.y.users.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -69,7 +70,14 @@ public class UserService implements IUserService {
 
     public UserEntity createUserEntity(String username, String password) {
         UserEntity user = new UserEntity(username, password);
-        userMessageProducer.sendMessage(user);
+        userMessageProducer.sendUserCreated(user);
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(String username) {
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+        userRepository.deleteByUsername(username);
+        userMessageProducer.sendUserDeleted(userEntity);
     }
 }

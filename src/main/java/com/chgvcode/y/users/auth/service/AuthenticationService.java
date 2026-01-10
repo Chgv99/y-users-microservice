@@ -32,7 +32,7 @@ public class AuthenticationService implements IAuthenticationService {
         UserEntity userEntity = userService.createUserEntity(request.username(), passwordEncoder.encode(request.password()));
 
         String jwt = jwtService.generateToken(userEntity);
-        userMessageProducer.sendMessage(userEntity);
+        userMessageProducer.sendUserCreated(userEntity);
         return new AuthenticationResponse(jwt);
     }
 

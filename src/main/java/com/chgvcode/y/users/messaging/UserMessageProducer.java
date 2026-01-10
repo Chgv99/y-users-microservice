@@ -13,11 +13,19 @@ import lombok.RequiredArgsConstructor;
 public class UserMessageProducer {
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendMessage(UserEntity userEntity) {
+    public void sendUserCreated(UserEntity userEntity) {
         UserMessage userMessage = new UserMessage(
             userEntity.getUuid(),
             userEntity.getUsername()
         );
         rabbitTemplate.convertAndSend("userCreationQueue", userMessage);
+    }
+
+    public void sendUserDeleted(UserEntity userEntity) {
+        UserMessage userMessage = new UserMessage(
+            userEntity.getUuid(),
+            userEntity.getUsername()
+        );
+        rabbitTemplate.convertAndSend("userDeletionQueue", userMessage);
     }
 }

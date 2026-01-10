@@ -15,6 +15,11 @@ public class RabbitMQConfig {
     public Queue userCreationQueue() {
         return new Queue("userCreationQueue");
     }
+    
+    @Bean
+    public Queue userDeletionQueue() {
+        return new Queue("userDeletionQueue");
+    }
 
     @Bean
     public MessageConverter jsonMessageConverter() {

@@ -18,4 +18,5 @@ public interface IUserService {
     public Page<UserResponse> getUsers(Pageable pageable);
     public UserResponse createUser(String username, String password);
     public UserEntity createUserEntity(String username, String password);
+    public void deleteUser(String username);
 }

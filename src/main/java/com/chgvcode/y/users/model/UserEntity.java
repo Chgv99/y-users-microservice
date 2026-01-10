@@ -36,6 +36,7 @@ public class UserEntity implements UserDetails { // extends User
 
     private UUID uuid;
 
+    @Column(unique = true)
     private String username;
 
     @Column(name = "password")

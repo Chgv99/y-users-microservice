@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
 import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
+import com.chgvcode.y.users.auth.dto.RegisterResponse;
 import com.chgvcode.y.users.auth.service.IAuthenticationService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
     

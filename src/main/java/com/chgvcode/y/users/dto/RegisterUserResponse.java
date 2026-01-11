@@ -3,8 +3,10 @@ package com.chgvcode.y.users.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResponse(
+public record RegisterUserResponse(
     UUID uuid,
     String username,
+    String firstName,
+    String lastName,
     Instant createdAt
 ) {}

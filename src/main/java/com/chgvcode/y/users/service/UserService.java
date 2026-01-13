@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
+import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.messaging.UserMessageProducer;
 import com.chgvcode.y.users.model.UserDetailEntity;
@@ -75,6 +76,31 @@ public class UserService implements IUserService {
         UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
         UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
         return new RegisterUserResponse(savedUser.getUuid(), savedUser.getUsername(), savedUserDetail.getFirstName(), savedUserDetail.getLastName(), savedUser.getCreatedAt());
+    }
+
+    @Transactional
+    public void updateUser(String username, UpdateUserRequest request) {
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+
+        if (!request.username().isEmpty()) {
+            userEntity.setUsername(request.username());
+        }
+
+        if (!request.firstName().isEmpty() && !request.lastName().isEmpty()) {
+            UserDetailEntity userDetailEntity = userDetailRepository.findByUser(userEntity);
+
+            if (!request.firstName().isEmpty()) {
+                userDetailEntity.setFirstName(request.firstName());
+            }
+
+            if (!request.lastName().isEmpty()) {
+                userDetailEntity.setLastName(request.lastName());
+            }
+
+            userDetailRepository.save(userDetailEntity);
+        }
+        
+        userRepository.save(userEntity);
     }
 
     @Transactional

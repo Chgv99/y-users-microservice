@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.chgvcode.y.users.dto.RegisterUserResponse;
+import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
 
 public interface IUserService {
@@ -16,6 +17,7 @@ public interface IUserService {
     public List<UserResponse> getUsersByUuids(List<UUID> uuids);
     public Page<UserResponse> getUsers(Pageable pageable);
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName);
+    public void updateUser(String username, UpdateUserRequest request);
     public void deleteUser(String username);
     public String generateToken(UUID uuid);
 }

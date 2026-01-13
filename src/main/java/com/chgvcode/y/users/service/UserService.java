@@ -66,12 +66,6 @@ public class UserService implements IUserService {
         return new PageImpl<>(userResponses, pageable, page.getTotalElements());
     }
 
-    public UserResponse createUser(String username, String password) {
-        RegisterUserResponse registerUserResponse = createUser(username, password, "", "");
-        return new UserResponse(registerUserResponse.uuid(),
-                registerUserResponse.username(), registerUserResponse.createdAt());
-    }
-
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName) {
         UserEntity user = new UserEntity(username, password);
         UserEntity savedUser = userRepository.save(user);

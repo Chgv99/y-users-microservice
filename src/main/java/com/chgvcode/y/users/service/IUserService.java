@@ -15,7 +15,6 @@ public interface IUserService {
     public UserResponse getUserByUuid(UUID uuid);
     public List<UserResponse> getUsersByUuids(List<UUID> uuids);
     public Page<UserResponse> getUsers(Pageable pageable);
-    public UserResponse createUser(String username, String password);
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName);
     public void deleteUser(String username);
     public String generateToken(UUID uuid);

@@ -13,6 +13,7 @@ import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.exception.ResourceNotFoundException;
+import com.chgvcode.y.users.mapper.UserMapper;
 import com.chgvcode.y.users.messaging.UserMessageProducer;
 import com.chgvcode.y.users.model.UserDetailEntity;
 import com.chgvcode.y.users.model.UserEntity;
@@ -31,55 +32,50 @@ public class UserService implements IUserService {
     private final UserMessageProducer userMessageProducer;
     private final JwtService jwtService;
 
+    private final UserMapper userMapper;
+
     public UserResponse getUserByUsername(String username) {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
-        return new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
-                userEntity.getCreatedAt());
+        return userMapper.entityToResponse(userEntity);
     }
 
     public List<UserResponse> getUserListByUsernames(List<String> usernames) {
         List<UserEntity> userEntities = userRepository.findByUsernameIn(usernames);
         return userEntities.stream()
-                .map(userEntity -> new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
-                        userEntity.getCreatedAt()))
+                .map(userEntity -> userMapper.entityToResponse(userEntity))
                 .toList();
     }
 
     public UserResponse getUserByUuid(UUID uuid) {
         UserEntity userEntity = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
-        return new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
-                userEntity.getCreatedAt());
+        return userMapper.entityToResponse(userEntity);
     }
 
     public List<UserResponse> getUsersByUuids(List<UUID> uuids) {
         List<UserEntity> userEntities = userRepository.findByUuidIn(uuids);
         return userEntities.stream()
-                .map(userEntity -> new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
-                        userEntity.getCreatedAt()))
+                .map(userEntity -> userMapper.entityToResponse(userEntity))
                 .toList();
     }
 
     public Page<UserResponse> getUsers(Pageable pageable) {
         Page<UserEntity> page = userRepository.findAll(pageable);
         List<UserResponse> userResponses = page.stream()
-                .map(userEntity -> new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
-                        userEntity.getCreatedAt()))
+                .map(userEntity -> userMapper.entityToResponse(userEntity))
                 .toList();
         return new PageImpl<>(userResponses, pageable, page.getTotalElements());
     }
 
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName) {
         UserEntity user = new UserEntity(username, password);
-        UserEntity savedUser = userRepository.save(user);
-        userMessageProducer.sendUserCreated(new UserResponse(savedUser.getUuid(),
-                savedUser.getUsername(), savedUser.getCreatedAt()));
+        UserEntity savedUser = userRepository.save(user); // TODO: Throw exception if exists
+        userMessageProducer.sendUserCreated(userMapper.entityToResponse(savedUser));
 
         UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
         UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
-        return new RegisterUserResponse(savedUser.getUuid(), savedUser.getUsername(), savedUserDetail.getFirstName(),
-                savedUserDetail.getLastName(), savedUser.getCreatedAt());
+        return userMapper.entityToRegisterResponse(savedUser, savedUserDetail);
     }
 
     @Transactional

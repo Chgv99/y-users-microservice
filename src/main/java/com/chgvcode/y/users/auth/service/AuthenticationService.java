@@ -11,6 +11,7 @@ import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.mapper.AuthenticationMapper;
 import com.chgvcode.y.users.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class AuthenticationService implements IAuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final AuthenticationMapper authenticationMapper;
+
     public RegisterResponse register(RegisterRequest request) {
         RegisterUserResponse userResponse = userService.createUser(
             request.username(), 
@@ -34,7 +37,7 @@ public class AuthenticationService implements IAuthenticationService {
         );
 
         String jwt = userService.generateToken(userResponse.uuid());
-        return new RegisterResponse(userResponse.uuid(), userResponse.username(), userResponse.firstName(), userResponse.lastName(), jwt);
+        return authenticationMapper.toRegisterResponse(userResponse, jwt);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {

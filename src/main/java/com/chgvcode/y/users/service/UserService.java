@@ -70,6 +70,7 @@ public class UserService implements IUserService {
         return new PageImpl<>(userResponses, pageable, page.getTotalElements());
     }
 
+    @Transactional
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName) {
         UserEntity user = new UserEntity(username, password);
         try {

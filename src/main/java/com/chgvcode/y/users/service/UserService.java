@@ -12,6 +12,7 @@ import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.exception.ResourceNotFoundException;
 import com.chgvcode.y.users.messaging.UserMessageProducer;
 import com.chgvcode.y.users.model.UserDetailEntity;
 import com.chgvcode.y.users.model.UserEntity;
@@ -31,7 +32,8 @@ public class UserService implements IUserService {
     private final JwtService jwtService;
 
     public UserResponse getUserByUsername(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(username));
         return new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
                 userEntity.getCreatedAt());
     }
@@ -45,7 +47,8 @@ public class UserService implements IUserService {
     }
 
     public UserResponse getUserByUuid(UUID uuid) {
-        UserEntity userEntity = userRepository.findByUuid(uuid).orElseThrow();
+        UserEntity userEntity = userRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
         return new UserResponse(userEntity.getUuid(), userEntity.getUsername(),
                 userEntity.getCreatedAt());
     }
@@ -75,12 +78,14 @@ public class UserService implements IUserService {
 
         UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
         UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
-        return new RegisterUserResponse(savedUser.getUuid(), savedUser.getUsername(), savedUserDetail.getFirstName(), savedUserDetail.getLastName(), savedUser.getCreatedAt());
+        return new RegisterUserResponse(savedUser.getUuid(), savedUser.getUsername(), savedUserDetail.getFirstName(),
+                savedUserDetail.getLastName(), savedUser.getCreatedAt());
     }
 
     @Transactional
     public void updateUser(String username, UpdateUserRequest request) {
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(username));
 
         if (!request.username().isEmpty()) {
             userEntity.setUsername(request.username());
@@ -99,19 +104,21 @@ public class UserService implements IUserService {
 
             userDetailRepository.save(userDetailEntity);
         }
-        
+
         userRepository.save(userEntity);
     }
 
     @Transactional
     public void deleteUser(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow();
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(username));
         userRepository.deleteByUsername(username);
         userMessageProducer.sendUserDeleted(userEntity);
     }
 
     public String generateToken(UUID uuid) {
-        UserEntity userEntity = userRepository.findByUuid(uuid).orElseThrow();
+        UserEntity userEntity = userRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
         return jwtService.generateToken(userEntity);
     }
 }

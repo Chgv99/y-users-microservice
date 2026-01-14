@@ -61,21 +61,13 @@ public class UserController {
 
     @PutMapping("/{username}")
     public ResponseEntity<?> updateUser(@PathVariable String username, @RequestBody UpdateUserRequest request) {
-        try {
-            userService.updateUser(username, request);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }  
+        userService.updateUser(username, request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @DeleteMapping("/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
-        try {
-            userService.deleteUser(username);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }  
+        userService.deleteUser(username);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -3,6 +3,7 @@ package com.chgvcode.y.users.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.exception.ResourceAlreadyExistsException;
 import com.chgvcode.y.users.exception.ResourceNotFoundException;
 import com.chgvcode.y.users.mapper.UserMapper;
 import com.chgvcode.y.users.messaging.UserMessageProducer;
@@ -70,12 +72,17 @@ public class UserService implements IUserService {
 
     public RegisterUserResponse createUser(String username, String password, String firstName, String lastName) {
         UserEntity user = new UserEntity(username, password);
-        UserEntity savedUser = userRepository.save(user); // TODO: Throw exception if exists
-        userMessageProducer.sendUserCreated(userMapper.entityToResponse(savedUser));
+        try {
+            UserEntity savedUser = userRepository.save(user);
+            
+            userMessageProducer.sendUserCreated(userMapper.entityToResponse(savedUser));
 
-        UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
-        UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
-        return userMapper.entityToRegisterResponse(savedUser, savedUserDetail);
+            UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
+            UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
+            return userMapper.entityToRegisterResponse(savedUser, savedUserDetail);
+        } catch (DataIntegrityViolationException dive) {
+            throw new ResourceAlreadyExistsException(user.getUsername());
+        }
     }
 
     @Transactional

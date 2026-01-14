@@ -11,13 +11,13 @@ import com.chgvcode.y.users.model.UserEntity;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    public UserResponse entityToResponse(UserEntity userEntity);
+    public UserResponse entityToUserResponse(UserEntity userEntity);
 
     @Mapping(source = "user.uuid", target = "uuid")
     @Mapping(source = "user.username", target = "username")
     @Mapping(source = "userDetail.firstName", target = "firstName")
     @Mapping(source = "userDetail.lastName", target = "lastName")
     @Mapping(source = "user.createdAt", target = "createdAt")
-    RegisterUserResponse entityToRegisterResponse(UserEntity user, UserDetailEntity userDetail);
+    RegisterUserResponse entityToRegisterUserResponse(UserEntity user, UserDetailEntity userDetail);
 
 }

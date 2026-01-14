@@ -39,33 +39,33 @@ public class UserService implements IUserService {
     public UserResponse getUserByUsername(String username) {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
-        return userMapper.entityToResponse(userEntity);
+        return userMapper.entityToUserResponse(userEntity);
     }
 
     public List<UserResponse> getUserListByUsernames(List<String> usernames) {
         List<UserEntity> userEntities = userRepository.findByUsernameIn(usernames);
         return userEntities.stream()
-                .map(userEntity -> userMapper.entityToResponse(userEntity))
+                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
                 .toList();
     }
 
     public UserResponse getUserByUuid(UUID uuid) {
         UserEntity userEntity = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
-        return userMapper.entityToResponse(userEntity);
+        return userMapper.entityToUserResponse(userEntity);
     }
 
     public List<UserResponse> getUsersByUuids(List<UUID> uuids) {
         List<UserEntity> userEntities = userRepository.findByUuidIn(uuids);
         return userEntities.stream()
-                .map(userEntity -> userMapper.entityToResponse(userEntity))
+                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
                 .toList();
     }
 
     public Page<UserResponse> getUsers(Pageable pageable) {
         Page<UserEntity> page = userRepository.findAll(pageable);
         List<UserResponse> userResponses = page.stream()
-                .map(userEntity -> userMapper.entityToResponse(userEntity))
+                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
                 .toList();
         return new PageImpl<>(userResponses, pageable, page.getTotalElements());
     }
@@ -76,11 +76,11 @@ public class UserService implements IUserService {
         try {
             UserEntity savedUser = userRepository.save(user);
             
-            userMessageProducer.sendUserCreated(userMapper.entityToResponse(savedUser));
+            userMessageProducer.sendUserCreated(userMapper.entityToUserResponse(savedUser));
 
             UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
             UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
-            return userMapper.entityToRegisterResponse(savedUser, savedUserDetail);
+            return userMapper.entityToRegisterUserResponse(savedUser, savedUserDetail);
         } catch (DataIntegrityViolationException dive) {
             throw new ResourceAlreadyExistsException(user.getUsername());
         }

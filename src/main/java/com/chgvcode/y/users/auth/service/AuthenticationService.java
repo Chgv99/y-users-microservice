@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
@@ -36,16 +36,15 @@ public class AuthenticationService implements IAuthenticationService {
             request.lastName()
         );
 
-        String jwt = userService.generateToken(userResponse.uuid());
-        return authenticationMapper.toRegisterResponse(userResponse, jwt);
+        TokenResponse tokenResponse = userService.generateToken(userResponse.uuid());
+        return authenticationMapper.toRegisterResponse(userResponse, tokenResponse);
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public TokenResponse authenticate(AuthenticationRequest request) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         UserResponse userResponse = userService.getUserByUsername(request.username());
 
-        String jwt = userService.generateToken(userResponse.uuid());
-        return new AuthenticationResponse(jwt);
+        return userService.generateToken(userResponse.uuid());
     }
 }

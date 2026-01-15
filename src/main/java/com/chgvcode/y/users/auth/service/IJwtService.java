@@ -10,4 +10,6 @@ public interface IJwtService {
     public boolean isTokenValid(String token, UserDetails userDetails);
 
     public String extractUsername(String token);
+
+    public long getExpirationSeconds(String token);
 }

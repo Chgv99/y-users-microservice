@@ -61,6 +61,14 @@ public class JwtService implements IJwtService {
         return claims.get("username", String.class);
     }
 
+    @Override
+    public long getExpirationSeconds(String token) {
+        final Claims claims = extractAllClaims(token);
+        long expirationMilis = claims.getExpiration().getTime();
+        long issuedMilis = claims.getIssuedAt().getTime();
+        return (expirationMilis - issuedMilis) / 1000;
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts
             .parser()

@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
@@ -120,9 +121,11 @@ public class UserService implements IUserService {
         userMessageProducer.sendUserDeleted(userEntity);
     }
 
-    public String generateToken(UUID uuid) {
+    public TokenResponse generateToken(UUID uuid) {
         UserEntity userEntity = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
-        return jwtService.generateToken(userEntity);
+        String token = jwtService.generateToken(userEntity);
+        Long seconds = jwtService.getExpirationSeconds(token);
+        return new TokenResponse(token, "Bearer", seconds);
     }
 }

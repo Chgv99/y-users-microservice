@@ -7,5 +7,5 @@ public record RegisterResponse(
     String username,
     String firstName,
     String lastName,
-    String jwt
+    TokenResponse tokenResponse
 ) {}

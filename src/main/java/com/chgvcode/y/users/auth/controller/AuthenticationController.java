@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
 import com.chgvcode.y.users.auth.service.IAuthenticationService;
@@ -28,7 +28,7 @@ public class AuthenticationController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
+    public ResponseEntity<TokenResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 }

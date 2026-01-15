@@ -54,12 +54,9 @@ public class GlobalExceptionHandler {
 
         String withSpaces = segments[segments.length - 1].replaceAll("([a-z])([A-Z])", "$1 $2");
 
-        // return withSpaces.substring(0, 1).toUpperCase()
-        // + withSpaces.substring(1).toLowerCase();
-
         int lastSpace = withSpaces.lastIndexOf(' ');
         if (lastSpace == -1) {
-            return ""; // solo había una palabra
+            return "";
         }
 
         return withSpaces.substring(0, lastSpace);

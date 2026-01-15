@@ -12,6 +12,7 @@ import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
 import com.chgvcode.y.users.auth.service.IAuthenticationService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,12 +23,12 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
     
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 }

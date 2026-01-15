@@ -23,6 +23,7 @@ import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.service.IUserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -60,7 +61,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<?> updateUser(@PathVariable String username, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserRequest request) {
         userService.updateUser(username, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }

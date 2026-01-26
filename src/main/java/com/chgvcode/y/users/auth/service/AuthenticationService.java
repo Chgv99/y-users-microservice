@@ -6,9 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.mapper.AuthenticationMapper;
@@ -22,6 +22,8 @@ public class AuthenticationService implements IAuthenticationService {
 
     private final UserService userService;
 
+    private final IJwtService jwtService;
+
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
@@ -30,14 +32,14 @@ public class AuthenticationService implements IAuthenticationService {
 
     public RegisterResponse register(RegisterRequest request) {
         RegisterUserResponse userResponse = userService.createUser(
-            request.username(), 
-            passwordEncoder.encode(request.password()),
-            request.firstName(),
-            request.lastName()
-        );
+                request.username(),
+                passwordEncoder.encode(request.password()),
+                request.firstName(),
+                request.lastName());
 
-        TokenResponse tokenResponse = userService.generateToken(userResponse.uuid());
-        return authenticationMapper.toRegisterResponse(userResponse, tokenResponse);
+        TokenResponse accessToken = jwtService.generateToken(userResponse.uuid().toString(), userResponse.username(),
+                userResponse.role(), userResponse.createdAt());
+        return authenticationMapper.toRegisterResponse(userResponse, accessToken);
     }
 
     public TokenResponse authenticate(AuthenticationRequest request) {
@@ -45,6 +47,7 @@ public class AuthenticationService implements IAuthenticationService {
                 .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         UserResponse userResponse = userService.getUserByUsername(request.username());
 
-        return userService.generateToken(userResponse.uuid());
+        return jwtService.generateToken(userResponse.uuid().toString(), userResponse.username(), userResponse.role(),
+                userResponse.createdAt());
     }
 }

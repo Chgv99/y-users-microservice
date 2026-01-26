@@ -9,8 +9,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.chgvcode.y.users.auth.dto.TokenResponse;
-import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
@@ -33,8 +31,6 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserDetailRepository userDetailRepository;
     private final UserMessageProducer userMessageProducer;
-    private final JwtService jwtService;
-
     private final UserMapper userMapper;
 
     public UserResponse getUserByUsername(String username) {
@@ -119,13 +115,5 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new ResourceNotFoundException(username));
         userRepository.deleteByUsername(username);
         userMessageProducer.sendUserDeleted(userEntity);
-    }
-
-    public TokenResponse generateToken(UUID uuid) {
-        UserEntity userEntity = userRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
-        String token = jwtService.generateToken(userEntity);
-        Long seconds = jwtService.getExpirationSeconds(token);
-        return new TokenResponse(token, "Bearer", seconds);
     }
 }

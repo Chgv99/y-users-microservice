@@ -1,11 +1,14 @@
 package com.chgvcode.y.users.auth.service;
 
+import java.time.Instant;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.chgvcode.y.users.model.UserEntity;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
+import com.chgvcode.y.users.config.Role;
 
 public interface IJwtService {
-    public String generateToken(UserEntity user);
+    public TokenResponse generateToken(String uuid, String username, Role role, Instant createdAt);
 
     public boolean isTokenValid(String token, UserDetails userDetails);
 

@@ -1,7 +1,7 @@
 package com.chgvcode.y.users.auth.service;
 
+import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.chgvcode.y.users.model.UserEntity;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
+import com.chgvcode.y.users.config.Role;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -33,12 +34,18 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public String generateToken(UserEntity user) {
+    public TokenResponse generateToken(String uuid, String username, Role role, Instant createdAt) {
+        String token = generate(uuid, username, role, createdAt);
+        Long seconds = getExpirationSeconds(token);
+        return new TokenResponse(token, "Bearer", seconds);
+    }
+
+    private String generate(String uuid, String username, Role role, Instant createdAt) {
         return Jwts.builder()
-                .subject(user.getUuid().toString())
-                .claim("username", user.getUsername())
-                .claim("roles", List.of(user.getRole()))
-                .claim("createdAt", user.getCreatedAt().toString())
+                .subject(uuid)
+                .claim("username", username)
+                .claim("role", role)
+                .claim("createdAt", createdAt.toEpochMilli())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey())

@@ -3,21 +3,19 @@ package com.chgvcode.y.users.auth.model;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.chgvcode.y.users.model.UserEntity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "refresh_token")
 @AllArgsConstructor
@@ -27,7 +25,7 @@ public class RefreshTokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_uuid", nullable = false, unique = true)
+    @Column(name = "user_uuid", nullable = false)
     private UUID userUuid;
 
     private String token;

@@ -7,14 +7,17 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.chgvcode.y.users.auth.dto.RefreshTokenResponse;
 import com.chgvcode.y.users.auth.model.RefreshTokenEntity;
 import com.chgvcode.y.users.repository.RefreshTokenRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,12 +31,12 @@ public class RefreshTokenService implements IRefreshTokenService {
     @Value("${application.security.refresh_token.expiration}")
     private int EXPIRATION_DAYS;
 
-    public RefreshTokenEntity createRefreshToken(UUID userUuid) {
+    public RefreshTokenResponse createRefreshToken(UUID userUuid) {
         String refreshToken = generate();
         String hashedToken = sha256(refreshToken);
         RefreshTokenEntity savedHashedRefreshToken = refreshTokenRepository
-                .save(new RefreshTokenEntity(userUuid, hashedToken, Instant.now().plus(EXPIRATION_DAYS, ChronoUnit.DAYS), null));
-        return savedHashedRefreshToken;
+                .save(new RefreshTokenEntity(userUuid, hashedToken, Instant.now().plus(EXPIRATION_DAYS, ChronoUnit.DAYS), false));
+        return new RefreshTokenResponse(savedHashedRefreshToken.getUserUuid(), refreshToken, savedHashedRefreshToken.getExpiresAt(), savedHashedRefreshToken.getRevoked());
     }
 
     private String generate() {
@@ -42,7 +45,24 @@ public class RefreshTokenService implements IRefreshTokenService {
         return base64Encoder.encodeToString(randomBytes);
     }
 
-    private String sha256(String token) {
+    public RefreshTokenResponse findByHash(String hashedToken) {
+        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByToken(hashedToken).orElseThrow();
+        return new RefreshTokenResponse(refreshTokenEntity.getUserUuid(), refreshTokenEntity.getToken(), refreshTokenEntity.getExpiresAt(), refreshTokenEntity.getRevoked());
+    }
+
+    public void revokeByHash(String hashedToken) {
+        RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByToken(hashedToken).orElseThrow();
+        refreshTokenEntity.setRevoked(true);
+        refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    @Transactional
+    public void revokeAllByUserUuid(UUID userUuid) {
+        List<RefreshTokenEntity> refreshTokenList = refreshTokenRepository.findAllByUserUuid(userUuid);
+        refreshTokenList.forEach((refreshToken) -> refreshToken.setRevoked(true));
+    }
+
+    public String sha256(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));

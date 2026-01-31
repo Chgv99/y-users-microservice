@@ -1,19 +1,24 @@
 package com.chgvcode.y.users.auth.controller;
 
-import org.apache.hc.core5.http.NotImplementedException;
+import java.time.Instant;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.TokenResponse;
-import com.chgvcode.y.users.auth.model.RefreshTokenEntity;
+import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
+import com.chgvcode.y.users.auth.dto.RefreshResult;
+import com.chgvcode.y.users.auth.dto.RefreshTokenResponse;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
 import com.chgvcode.y.users.auth.dto.RegisterResponse;
+import com.chgvcode.y.users.auth.dto.TokenResponse;
 import com.chgvcode.y.users.auth.service.IAuthenticationService;
 import com.chgvcode.y.users.auth.service.IRefreshTokenService;
 import com.chgvcode.y.users.auth.service.RefreshCookieFactory;
@@ -26,29 +31,42 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-    
+
     private final IAuthenticationService authenticationService;
 
     private final IRefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request, HttpServletResponse response) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request,
+            HttpServletResponse response) {
         RegisterResponse registerResponse = authenticationService.register(request);
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(registerResponse.uuid());
-        ResponseCookie cookie = RefreshCookieFactory.create(refreshToken.getToken(), refreshToken.getExpiresAt());
+
+        RefreshTokenResponse refreshToken = refreshTokenService.createRefreshToken(registerResponse.uuid());
+        ResponseCookie cookie = RefreshCookieFactory.create(refreshToken.token(), refreshToken.expiresAt());
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         return ResponseEntity.ok(registerResponse);
     }
 
-    // TODO
-    // @PostMapping("/refresh")
-    // public ResponseEntity<?> refresh() {
-    //     throw new NotImplementedException();
-    //     return ResponseEntity.ok();
-    // }
-    
+    @GetMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(
+            @CookieValue("refresh_token") String refreshToken,
+            HttpServletResponse response) {
+        RefreshResult result = authenticationService.refresh(refreshToken);
+        ResponseCookie cookie = RefreshCookieFactory.create(result.refreshToken().token(),
+                Instant.ofEpochMilli(result.refreshToken().expiresIn()));
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok(result.accessToken());
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    public ResponseEntity<TokenResponse> authenticate(@Valid @RequestBody AuthenticationRequest request, HttpServletResponse response) {
+        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
+
+        RefreshTokenResponse refreshToken = refreshTokenService.createRefreshToken(authenticationResponse.user().uuid());
+        ResponseCookie cookie = RefreshCookieFactory.create(refreshToken.token(), refreshToken.expiresAt());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(authenticationResponse.token());
     }
 }

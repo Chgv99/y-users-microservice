@@ -49,6 +49,15 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ProblemDetail handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        problem.setTitle(getTitleFromException(ex));
+        problem.setDetail(ex.getMessage());
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
     private String getTitleFromException(Exception exception) {
         String[] segments = exception.getClass().getName().split("\\.");
 

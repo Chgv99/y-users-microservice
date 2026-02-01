@@ -7,17 +7,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.chgvcode.y.users.auth.dto.AccessTokenDto;
+import com.chgvcode.y.users.auth.dto.AuthenticationDto;
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
-import com.chgvcode.y.users.auth.dto.RefreshResult;
-import com.chgvcode.y.users.auth.dto.RefreshTokenResponse;
+import com.chgvcode.y.users.auth.dto.RefreshResultDto;
+import com.chgvcode.y.users.auth.dto.RegisterDto;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
-import com.chgvcode.y.users.auth.dto.RegisterResponse;
-import com.chgvcode.y.users.auth.dto.TokenResponse;
-import com.chgvcode.y.users.dto.RegisterUserResponse;
-import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.auth.model.RefreshToken;
 import com.chgvcode.y.users.exception.UnauthorizedException;
 import com.chgvcode.y.users.mapper.AuthenticationMapper;
+import com.chgvcode.y.users.mapper.RegisterMapper;
+import com.chgvcode.y.users.model.User;
 import com.chgvcode.y.users.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -37,24 +37,28 @@ public class AuthenticationService implements IAuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final RegisterMapper registerMapper;
+
     private final AuthenticationMapper authenticationMapper;
 
-    public RegisterResponse register(RegisterRequest request) {
-        RegisterUserResponse userResponse = userService.createUser(
+    public RegisterDto register(RegisterRequest request) {
+        User user = userService.createUser(
                 request.username(),
                 passwordEncoder.encode(request.password()),
                 request.firstName(),
                 request.lastName());
 
-        TokenResponse accessToken = jwtService.generateToken(userResponse.uuid().toString(), userResponse.username(),
-                userResponse.role(), userResponse.createdAt());
-        return authenticationMapper.toRegisterResponse(userResponse, accessToken);
+        AccessTokenDto accessToken = jwtService.generateToken(user.uuid().toString(), user.username(),
+                user.role(), user.createdAt());
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.uuid());
+        return registerMapper.toDto(user, accessToken, refreshToken);
     }
 
     @Transactional
-    public RefreshResult refresh(String refreshToken) {
+    public RefreshResultDto refresh(String refreshToken) {
         String incomingHash = refreshTokenService.sha256(refreshToken);
-        RefreshTokenResponse storedRefreshToken = refreshTokenService.findByHash(incomingHash);
+        RefreshToken storedRefreshToken = refreshTokenService.findByHash(incomingHash);
 
         if (storedRefreshToken.revoked()) {
             throw new UnauthorizedException();
@@ -66,20 +70,23 @@ public class AuthenticationService implements IAuthenticationService {
         }
 
         refreshTokenService.revokeByHash(storedRefreshToken.token());
-        UserResponse userResponse = userService.getUserByUuid(storedRefreshToken.userUuid());
-        RefreshTokenResponse newRefreshToken = refreshTokenService.createRefreshToken(userResponse.uuid());
-        TokenResponse accessResponse = jwtService.generateToken(userResponse.uuid().toString(), userResponse.username(), userResponse.role(), userResponse.createdAt());
-        TokenResponse refreshResponse = new TokenResponse(newRefreshToken.token(), "Refresh", newRefreshToken.expiresAt().toEpochMilli());
-        return new RefreshResult(accessResponse, refreshResponse);
+        User user = userService.getUserByUuid(storedRefreshToken.userUuid());
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.uuid());
+        AccessTokenDto accessResponse = jwtService.generateToken(user.uuid().toString(),
+                user.username(), user.role(), user.createdAt());
+        return new RefreshResultDto(accessResponse, newRefreshToken);
+
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationDto authenticate(AuthenticationRequest request) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-        UserResponse userResponse = userService.getUserByUsername(request.username());
-        TokenResponse tokenResponse = jwtService.generateToken(userResponse.uuid().toString(), userResponse.username(), userResponse.role(),
-                userResponse.createdAt());
+        User user = userService.getUserByUsername(request.username());
+        AccessTokenDto accessToken = jwtService.generateToken(user.uuid().toString(), user.username(),
+                user.role(),
+                user.createdAt());
 
-        return new AuthenticationResponse(userResponse, tokenResponse);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.uuid());
+        return authenticationMapper.toDto(user, accessToken, refreshToken);
     }
 }

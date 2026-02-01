@@ -1,13 +1,13 @@
 package com.chgvcode.y.users.auth.service;
 
+import com.chgvcode.y.users.auth.dto.AuthenticationDto;
 import com.chgvcode.y.users.auth.dto.AuthenticationRequest;
-import com.chgvcode.y.users.auth.dto.AuthenticationResponse;
-import com.chgvcode.y.users.auth.dto.RefreshResult;
+import com.chgvcode.y.users.auth.dto.RefreshResultDto;
+import com.chgvcode.y.users.auth.dto.RegisterDto;
 import com.chgvcode.y.users.auth.dto.RegisterRequest;
-import com.chgvcode.y.users.auth.dto.RegisterResponse;
 
 public interface IAuthenticationService {
-    public RegisterResponse register(RegisterRequest request);
-    public RefreshResult refresh(String refreshToken);
-    public AuthenticationResponse authenticate(AuthenticationRequest request);
+    public RegisterDto register(RegisterRequest request);
+    public RefreshResultDto refresh(String refreshToken);
+    public AuthenticationDto authenticate(AuthenticationRequest request);
 }

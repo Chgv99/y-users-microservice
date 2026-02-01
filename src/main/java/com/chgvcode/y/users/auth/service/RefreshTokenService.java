@@ -13,7 +13,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.chgvcode.y.users.auth.dto.RefreshTokenResponse;
+import com.chgvcode.y.users.auth.mapper.RefreshTokenMapper;
+import com.chgvcode.y.users.auth.model.RefreshToken;
 import com.chgvcode.y.users.auth.model.RefreshTokenEntity;
 import com.chgvcode.y.users.repository.RefreshTokenRepository;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RefreshTokenService implements IRefreshTokenService {
 
+    private final RefreshTokenMapper refreshTokenMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final SecureRandom secureRandom = new SecureRandom();
     private final Base64.Encoder base64Encoder = Base64.getUrlEncoder().withoutPadding();
@@ -31,12 +33,15 @@ public class RefreshTokenService implements IRefreshTokenService {
     @Value("${application.security.refresh_token.expiration}")
     private int EXPIRATION_DAYS;
 
-    public RefreshTokenResponse createRefreshToken(UUID userUuid) {
+    public RefreshToken createRefreshToken(UUID userUuid) {
         String refreshToken = generate();
         String hashedToken = sha256(refreshToken);
         RefreshTokenEntity savedHashedRefreshToken = refreshTokenRepository
-                .save(new RefreshTokenEntity(userUuid, hashedToken, Instant.now().plus(EXPIRATION_DAYS, ChronoUnit.DAYS), false));
-        return new RefreshTokenResponse(savedHashedRefreshToken.getUserUuid(), refreshToken, savedHashedRefreshToken.getExpiresAt(), savedHashedRefreshToken.getRevoked());
+                .save(new RefreshTokenEntity(userUuid, hashedToken,
+                        Instant.now().plus(EXPIRATION_DAYS, ChronoUnit.DAYS), false));
+
+        return new RefreshToken(savedHashedRefreshToken.getUserUuid(), refreshToken,
+                savedHashedRefreshToken.getExpiresAt(), savedHashedRefreshToken.getRevoked());
     }
 
     private String generate() {
@@ -45,9 +50,9 @@ public class RefreshTokenService implements IRefreshTokenService {
         return base64Encoder.encodeToString(randomBytes);
     }
 
-    public RefreshTokenResponse findByHash(String hashedToken) {
+    public RefreshToken findByHash(String hashedToken) {
         RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByToken(hashedToken).orElseThrow();
-        return new RefreshTokenResponse(refreshTokenEntity.getUserUuid(), refreshTokenEntity.getToken(), refreshTokenEntity.getExpiresAt(), refreshTokenEntity.getRevoked());
+        return refreshTokenMapper.toModel(refreshTokenEntity);
     }
 
     public void revokeByHash(String hashedToken) {

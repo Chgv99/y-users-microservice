@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.chgvcode.y.users.auth.dto.TokenResponse;
+import com.chgvcode.y.users.auth.dto.AccessTokenDto;
 import com.chgvcode.y.users.config.Role;
 
 import io.jsonwebtoken.Claims;
@@ -34,10 +34,10 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public TokenResponse generateToken(String uuid, String username, Role role, Instant createdAt) {
+    public AccessTokenDto generateToken(String uuid, String username, Role role, Instant createdAt) {
         String token = generate(uuid, username, role, createdAt);
         Long seconds = getExpirationSeconds(token);
-        return new TokenResponse(token, "Bearer", seconds);
+        return new AccessTokenDto(token, seconds);
     }
 
     private String generate(String uuid, String username, Role role, Instant createdAt) {

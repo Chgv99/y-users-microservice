@@ -112,9 +112,11 @@ public class UserService implements IUserService {
 
     @Transactional
     public void deleteUser(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username)
+        UserEntity deletedUserEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
         userRepository.deleteByUsername(username);
-        userMessageProducer.sendUserDeleted(userEntity);
+
+        User deletedUser = userMapper.toModel(deletedUserEntity);
+        userMessageProducer.sendUserDeleted(deletedUser);
     }
 }

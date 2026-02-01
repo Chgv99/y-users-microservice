@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserMessage {
+public class UserMessageDto {
     private UUID uuid;
     private String username;
 }

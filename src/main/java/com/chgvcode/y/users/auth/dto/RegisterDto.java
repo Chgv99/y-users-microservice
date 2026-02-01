@@ -2,10 +2,13 @@ package com.chgvcode.y.users.auth.dto;
 
 import java.util.UUID;
 
-public record RegisterResponse(
+import com.chgvcode.y.users.auth.model.RefreshToken;
+
+public record RegisterDto(
     UUID uuid,
     String username,
     String firstName,
     String lastName,
-    TokenResponse tokenResponse
+    AccessTokenDto accessToken,
+    RefreshToken refreshToken
 ) {}

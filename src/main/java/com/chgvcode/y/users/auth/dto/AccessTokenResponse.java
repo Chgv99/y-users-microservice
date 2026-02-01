@@ -1,7 +1,6 @@
 package com.chgvcode.y.users.auth.dto;
 
-public record TokenResponse(
+public record AccessTokenResponse(
     String token,
-    String type,
     Long expiresIn
 ) {}

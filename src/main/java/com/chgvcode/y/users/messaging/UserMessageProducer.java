@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.dto.UserMessageDto;
 import com.chgvcode.y.users.model.User;
-import com.chgvcode.y.users.model.UserEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,10 +21,10 @@ public class UserMessageProducer {
         rabbitTemplate.convertAndSend("userCreationQueue", userMessage);
     }
 
-    public void sendUserDeleted(UserEntity userEntity) {
-        UserMessage userMessage = new UserMessage(
-            userEntity.getUuid(),
-            userEntity.getUsername()
+    public void sendUserDeleted(User user) {
+        UserMessageDto userMessage = new UserMessageDto(
+            user.uuid(),
+            user.username()
         );
         rabbitTemplate.convertAndSend("userDeletionQueue", userMessage);
     }

@@ -14,7 +14,9 @@ public interface UserMapper {
 
     public User toModel(UserEntity userEntity);
     
-    public UserResponse toUserResponse(UserEntity userEntity);
+    public UserResponse toResponse(UserEntity userEntity);
+    
+    public UserResponse toResponse(User user);
 
     @Mapping(source = "user.uuid", target = "uuid")
     @Mapping(source = "user.username", target = "username")

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chgvcode.y.users.dto.UpdateUserRequest;
 import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.mapper.UserMapper;
+import com.chgvcode.y.users.model.User;
 import com.chgvcode.y.users.service.IUserService;
 
 import jakarta.validation.Valid;
@@ -33,9 +35,12 @@ public class UserController {
 
     private final IUserService userService;
 
+    private final UserMapper userMapper;
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(userService.getUserByUsername(user.getUsername()));
+        User currentUser = userService.getUserByUsername(user.getUsername());
+        return ResponseEntity.ok(userMapper.toResponse(currentUser));
     }
 
     @GetMapping

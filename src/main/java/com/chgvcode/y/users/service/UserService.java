@@ -9,13 +9,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
-import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.exception.ResourceAlreadyExistsException;
 import com.chgvcode.y.users.exception.ResourceNotFoundException;
 import com.chgvcode.y.users.mapper.UserMapper;
 import com.chgvcode.y.users.messaging.UserMessageProducer;
+import com.chgvcode.y.users.model.User;
 import com.chgvcode.y.users.model.UserDetailEntity;
 import com.chgvcode.y.users.model.UserEntity;
 import com.chgvcode.y.users.repository.UserDetailRepository;
@@ -33,51 +32,53 @@ public class UserService implements IUserService {
     private final UserMessageProducer userMessageProducer;
     private final UserMapper userMapper;
 
-    public UserResponse getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(username));
-        return userMapper.entityToUserResponse(userEntity);
+        return userMapper.toModel(userEntity);
     }
 
-    public List<UserResponse> getUserListByUsernames(List<String> usernames) {
+    public List<User> getUserListByUsernames(List<String> usernames) {
         List<UserEntity> userEntities = userRepository.findByUsernameIn(usernames);
         return userEntities.stream()
-                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
+                .map(userEntity -> userMapper.toModel(userEntity))
                 .toList();
     }
 
-    public UserResponse getUserByUuid(UUID uuid) {
+    public User getUserByUuid(UUID uuid) {
         UserEntity userEntity = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException(uuid.toString()));
-        return userMapper.entityToUserResponse(userEntity);
+        return userMapper.toModel(userEntity);
     }
 
-    public List<UserResponse> getUsersByUuids(List<UUID> uuids) {
+    public List<User> getUsersByUuids(List<UUID> uuids) {
         List<UserEntity> userEntities = userRepository.findByUuidIn(uuids);
         return userEntities.stream()
-                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
+                .map(userEntity -> userMapper.toModel(userEntity))
                 .toList();
     }
 
-    public Page<UserResponse> getUsers(Pageable pageable) {
+    public Page<User> getUsers(Pageable pageable) {
         Page<UserEntity> page = userRepository.findAll(pageable);
-        List<UserResponse> userResponses = page.stream()
-                .map(userEntity -> userMapper.entityToUserResponse(userEntity))
+        List<User> users = page.stream()
+                .map(userEntity -> userMapper.toModel(userEntity))
                 .toList();
-        return new PageImpl<>(userResponses, pageable, page.getTotalElements());
+        return new PageImpl<>(users, pageable, page.getTotalElements());
     }
 
     @Transactional
-    public RegisterUserResponse createUser(String username, String password, String firstName, String lastName) {
+    public User createUser(String username, String password, String firstName, String lastName) {
         UserEntity user = new UserEntity(username, password);
         try {
-            UserEntity savedUser = userRepository.save(user);
-            
-            userMessageProducer.sendUserCreated(userMapper.entityToUserResponse(savedUser));
+            UserEntity savedUserEntity = userRepository.save(user);
+            User savedUser = userMapper.toModel(savedUserEntity);
 
-            UserDetailEntity userDetail = new UserDetailEntity(savedUser, firstName, lastName);
+            userMessageProducer.sendUserCreated(savedUser);
+
+            UserDetailEntity userDetail = new UserDetailEntity(savedUserEntity, firstName, lastName);
             UserDetailEntity savedUserDetail = userDetailRepository.save(userDetail);
-            return userMapper.entityToRegisterUserResponse(savedUser, savedUserDetail);
+
+            return savedUser;
         } catch (DataIntegrityViolationException dive) {
             throw new ResourceAlreadyExistsException(user.getUsername());
         }

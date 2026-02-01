@@ -4,7 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.chgvcode.y.users.dto.UserMessage;
-import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.model.User;
 import com.chgvcode.y.users.model.UserEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 public class UserMessageProducer {
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendUserCreated(UserResponse userResponse) {
+    public void sendUserCreated(User user) {
         UserMessage userMessage = new UserMessage(
-            userResponse.uuid(),
-            userResponse.username()
+            user.getUuid(),
+            user.getUsername()
         );
         rabbitTemplate.convertAndSend("userCreationQueue", userMessage);
     }

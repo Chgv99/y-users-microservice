@@ -6,17 +6,16 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
-import com.chgvcode.y.users.dto.UserResponse;
+import com.chgvcode.y.users.model.User;
 
 public interface IUserService {
-    public UserResponse getUserByUsername(String username);
-    public List<UserResponse> getUserListByUsernames(List<String> usernames);
-    public UserResponse getUserByUuid(UUID uuid);
-    public List<UserResponse> getUsersByUuids(List<UUID> uuids);
-    public Page<UserResponse> getUsers(Pageable pageable);
-    public RegisterUserResponse createUser(String username, String password, String firstName, String lastName);
+    public User getUserByUsername(String username);
+    public List<User> getUserListByUsernames(List<String> usernames);
+    public User getUserByUuid(UUID uuid);
+    public List<User> getUsersByUuids(List<UUID> uuids);
+    public Page<User> getUsers(Pageable pageable);
+    public User createUser(String username, String password, String firstName, String lastName);
     public void updateUser(String username, UpdateUserRequest request);
     public void deleteUser(String username);
 }

@@ -13,7 +13,7 @@ public class RefreshCookieFactory {
                 .httpOnly(true)
                 .secure(false) // false only local
                 .sameSite("Lax") // or "Strict"
-                .path("/auth/refresh")
+                .path("/")
                 .maxAge(maxAgeSeconds)
                 .build();
     }

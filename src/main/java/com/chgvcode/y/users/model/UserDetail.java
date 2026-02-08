@@ -7,7 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserDetail {
     private Long id;
-    private UserEntity user;
     private String firstName;
     private String lastName;
 }

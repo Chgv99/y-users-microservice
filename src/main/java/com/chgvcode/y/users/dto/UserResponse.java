@@ -9,5 +9,6 @@ public record UserResponse(
     UUID uuid,
     String username,
     Role role,
+    UserDetailResponse detail,
     Instant createdAt
 ) {}

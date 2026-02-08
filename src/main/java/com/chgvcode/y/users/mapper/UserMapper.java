@@ -9,7 +9,7 @@ import com.chgvcode.y.users.model.User;
 import com.chgvcode.y.users.model.UserDetailEntity;
 import com.chgvcode.y.users.model.UserEntity;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = UserDetailMapper.class)
 public interface UserMapper {
 
     public User toModel(UserEntity userEntity);

@@ -3,6 +3,8 @@ package com.chgvcode.y.users.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -53,16 +55,23 @@ public class UserController {
 
         if (uuids != null && !uuids.isEmpty()) {
             return ResponseEntity.ok(userService.getUsersByUuids(uuids));
-        } else if (usernames != null && !usernames.isEmpty()) {
+        } 
+        
+        if (usernames != null && !usernames.isEmpty()) {
             return ResponseEntity.ok(userService.getUserListByUsernames(usernames));
-        } else {
-            String[] sortParams = sort.split(",");
-            Pageable pageable = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]));
-            return ResponseEntity.ok(userService.getUsers(pageable));
         }
+
+        String[] sortParams = sort.split(",");
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]));
+
+        Page<User> userPage = userService.getUsers(pageable);
+        List<UserResponse> userResponses = userPage.getContent().stream().map(user -> {
+            return userMapper.toResponse(user);
+        }).toList();
+        return ResponseEntity.ok(new PageImpl<>(userResponses, pageable, userPage.getTotalElements()));
     }
 
     @PutMapping("/{username}")

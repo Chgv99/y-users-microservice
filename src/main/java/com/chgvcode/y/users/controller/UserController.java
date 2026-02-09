@@ -54,11 +54,13 @@ public class UserController {
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
 
         if (uuids != null && !uuids.isEmpty()) {
-            return ResponseEntity.ok(userService.getUsersByUuids(uuids));
+            List<User> users = userService.getUsersByUuids(uuids);
+            return ResponseEntity.ok(users.stream().map(user -> userMapper.toResponse(user)));
         } 
         
         if (usernames != null && !usernames.isEmpty()) {
-            return ResponseEntity.ok(userService.getUserListByUsernames(usernames));
+            List<User> users = userService.getUserListByUsernames(usernames);
+            return ResponseEntity.ok(users.stream().map(user -> userMapper.toResponse(user)));
         }
 
         String[] sortParams = sort.split(",");

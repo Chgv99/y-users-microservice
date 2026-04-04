@@ -93,7 +93,7 @@ public class UserService implements IUserService {
             userEntity.setUsername(request.username());
         }
 
-        if (!request.firstName().isEmpty() && !request.lastName().isEmpty()) {
+        if (!request.firstName().isEmpty() || !request.lastName().isEmpty()) {
             UserDetailEntity userDetailEntity = userDetailRepository.findByUser(userEntity);
 
             if (!request.firstName().isEmpty()) {

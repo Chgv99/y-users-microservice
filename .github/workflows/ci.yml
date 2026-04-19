@@ -1,4 +1,4 @@
-name: Test Project
+name: Test & Push Project
 
 on:
   pull_request:
@@ -45,9 +45,9 @@ jobs:
       - name: Login to Dockerhub
         uses: docker/login-action@v3
         with:
-          username: ${{ dockerhub.DOCKERHUB_USERNAME }}
-          password: ${{ dockerhub.DOCKERHUB_TOKEN }}
-          
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build & Push
         uses: docker/build-push-action@v6
         with:

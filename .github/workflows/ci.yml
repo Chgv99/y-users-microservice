@@ -39,9 +39,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # TODO: calculate semver
-
+        
       - name: Login to Dockerhub
         uses: docker/login-action@v3
         with:

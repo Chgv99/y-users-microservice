@@ -44,11 +44,12 @@ jobs:
       - name: Extract version from merge commit
         id: semver
         run: |
-          VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP '\d+\.\d+\.\d+')
-          if [ -z "$VERSION" ]; then
+          RAW=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'v?\d+\.\d+\.\d+' | head -1)
+          if [ -z "$RAW" ]; then
             echo "No version found in commit message"
             exit 1
           fi
+          VERSION=${RAW#v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Configure Java 21

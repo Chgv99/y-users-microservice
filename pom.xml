@@ -11,13 +11,14 @@
 	</parent>
 	<groupId>com.chgvcode</groupId>
 	<artifactId>users</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>users</name>
 	<description>Y - Social Network</description>
 	<properties>
 		<java.version>21</java.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
 		<lombok.version>1.18.42</lombok.version>
+		<revision>0.0.1-SNAPSHOT</revision>
 	</properties>
 	<dependencies>
 		<dependency>

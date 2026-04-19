@@ -28,7 +28,6 @@ import com.chgvcode.y.users.auth.service.JwtService;
 import com.chgvcode.y.users.config.Role;
 import com.chgvcode.y.users.dto.RegisterUserResponse;
 import com.chgvcode.y.users.dto.UpdateUserRequest;
-import com.chgvcode.y.users.dto.UserResponse;
 import com.chgvcode.y.users.exception.ResourceAlreadyExistsException;
 import com.chgvcode.y.users.exception.ResourceNotFoundException;
 import com.chgvcode.y.users.mapper.UserMapper;

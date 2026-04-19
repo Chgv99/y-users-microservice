@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test                          # waits for tests to pass
     if: github.event_name == 'push'      # only on push, not pull_request
+    environment: dockerhub
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
